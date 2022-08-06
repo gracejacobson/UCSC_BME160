@@ -98,73 +98,38 @@ class NucParams:
         'Y': {'UAU' : 0, 'UAC' : 0},
     }
     
-    for aa in list(rnaCount.keys()):
-        for codon in list(rnaCount[aa]):
-            rnaCount[aa][codon.replace('U', 'T')] = rnaCount[aa].pop(codon)
     
     nucComp = { 'A': 0, 'T' : 0, 'C' : 0, 'G': 0, 'N' : 0 , 'U' : 0}
-    
-    """""codonComp = { 
-        # U
-    'UUU': 0, 'UCU': 0, 'UAU': 0, 'UGU': 0,  # UxU
-    'UUC': 0, 'UCC': 0, 'UAC': 0, 'UGC': 0,  # UxC
-    'UUA': 0, 'UCA': 0, 'UAA': 0, 'UGA': 0,  # UxA
-    'UUG': 0, 'UCG': 0, 'UAG': 0, 'UGG': 0,  # UxG
-    # C
-    'CUU': 0, 'CCU': 0, 'CAU': 0, 'CGU': 0,  # CxU
-    'CUC': 0, 'CCC': 0, 'CAC': 0, 'CGC': 0,  # CxC
-    'CUA': 0, 'CCA': 0, 'CAA': 0, 'CGA': 0,  # CxA
-    'CUG': 0, 'CCG': 0, 'CAG': 0, 'CGG': 0,  # CxG
-    # A
-    'AUU': 0, 'ACU': 0, 'AAU': 0, 'AGU': 0,  # AxU
-    'AUC': 0, 'ACC': 0, 'AAC': 0, 'AGC': 0,  # AxC
-    'AUA': 0, 'ACA': 0, 'AAA': 0, 'AGA': 0,  # AxA
-    'AUG': 0, 'ACG': 0, 'AAG': 0, 'AGG': 0,  # AxG
-    # G
-    'GUU': 0, 'GCU': 0, 'GAU': 0, 'GGU': 0,  # GxU
-    'GUC': 0, 'GCC': 0, 'GAC': 0, 'GGC': 0,  # GxC
-    'GUA': 0, 'GCA': 0, 'GAA': 0, 'GGA': 0,  # GxA
-    'GUG': 0, 'GCG': 0, 'GAG': 0, 'GGG': 0  # GxG
-    }"""
-        
 
     def __init__ (self, inString=''):
         self.addSequence(inString)
         return
      
     def addSequence (self, inSeq):
-
-        
         for i in range (0, len(inSeq), 3):
             codon = inSeq[i:i+3]
-            self.rnaCount[self.dnaCodonTable[codon]][codon] += 1
-        
-            
-            
+            rnaCodon = codon.replace("T", "U")
+            if rnaCodon in (self.rnaCodonTable.keys()):
+                if rnaCodon in (self.rnaCount[self.dnaCodonTable[codon]].keys()):
+                    self.rnaCount[self.rnaCodonTable[rnaCodon]][rnaCodon] += 1         
         for i in inSeq:
             self.nucComp[i] += 1
-    
         return
     
     def aaComposition(self):
         aaComp = {}
-        
         for aa in self.rnaCount.keys():
             aaComp[aa] = sum(self.rnaCount[aa].values())
-        
         return aaComp
         
-    
     def nucComposition(self):
         return self.nucComp
     
     def codonComposition(self):
         codonComp = {}
-        
         for codondict in self.rnaCount.values():
             for codon, value in codondict.items():
-                codonComp[codon] = value
-                
+                codonComp[codon] = value    
         return codonComp
     
     def nucCount(self):
@@ -172,17 +137,10 @@ class NucParams:
         return nucCount
     
 def main ():
-    myReader = FastAreader('testgenome.fa')# make sure to change this to use stdin
+    myReader = FastAreader('testGenome2.fa')# make sure to change this to use stdin
     myNuc = NucParams()
     for head, seq in myReader.readFasta() :
         myNuc.addSequence(seq)
-    
-    print('aa comp\n')
-    print(myNuc.aaComposition())
-    print('\nnuc comp\n')
-    print(myNuc.nucComposition() )
-    print('\ncodon comp\n')
-    print(myNuc.codonComposition() )
     
     #print sequence length
     nucCount = (myNuc.nucCount()) / 1000000 #convert to Mb
@@ -196,7 +154,10 @@ def main ():
     for aa in sorted(myNuc.rnaCount.keys()):
         denom = sum(myNuc.rnaCount[aa].values())
         for codon in sorted(myNuc.rnaCount[aa].keys()):
-            val = myNuc.rnaCount[aa][codon] / denom
+            if denom == 0:
+                val = 0
+            else:
+                val = myNuc.rnaCount[aa][codon] / denom
             print ('{:s} : {:s} {:5.1f} ({:6d})'.format(codon, aa, val*100, myNuc.rnaCount[aa][codon]))
 
 if __name__ == "__main__":
