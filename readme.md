@@ -1,5 +1,5 @@
 # BME 160: Research Programming in the Life Sciences
-This repo contains assignments from the BME160 course at UCSC which focused on programming in Python to manipula te biological data. I took this course in Spring 2021.
+This repo contains assignments from the BME160 course at UCSC which focused on programming in Python to manipulate biological data. I took this course in Spring 2021.
 
 ## Lab 2:
 1. **converter.py**: Convert from amino acid abbreviations to DNA/RNA codons and vice versa.
